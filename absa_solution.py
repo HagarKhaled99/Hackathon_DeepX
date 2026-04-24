@@ -84,7 +84,32 @@ def load_labeled(path):
     return df
 
 def load_unlabeled(path):
-    df = pd.read_excel(path)
+    # Try every possible format automatically
+    df = None
+    for engine in ["openpyxl", "xlrd"]:
+        try:
+            df = pd.read_excel(path, engine=engine)
+            print(f"  Loaded with engine: {engine}")
+            break
+        except:
+            continue
+    
+    if df is None:
+        for sep in [",", ";", "\t"]:
+            try:
+                df = pd.read_csv(path, sep=sep, encoding="utf-8")
+                print(f"  Loaded as CSV (sep='{sep}')")
+                break
+            except:
+                continue
+    
+    if df is None:
+        try:
+            df = pd.read_csv(path, encoding="latin-1")
+            print(f"  Loaded as CSV latin-1")
+        except:
+            raise ValueError(f"Cannot read file: {path}")
+    
     df["review_text"] = df["review_text"].fillna("").astype(str)
     return df
 
@@ -100,7 +125,7 @@ val_df   = load_labeled("DeepX_validation.xlsx")
 print(f"  Train: {len(train_df):,} | Val: {len(val_df):,}")
 
 test_df, test_file = None, None
-for cand in ["DeepX_hidden_test.xlsx", "hidden_test_nolabels.xlsx", "DeepX_test.xlsx"]:
+for cand in ["DeepX_unlabeled.xlsx"]:
     if os.path.exists(cand):
         test_df, test_file = load_unlabeled(cand), cand
         break

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" id="htmlRoot">
+<head>
+<link rel="stylesheet" href="/static/style.css">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Arabic ABSA — Sentiment Analysis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+ 
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
+ 
+<div class="app-wrapper">
+ 
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <div class="logo-icon">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <circle cx="14" cy="14" r="13" stroke="white" stroke-width="1.5"/>
+            <path d="M8 14 Q14 7 20 14 Q14 21 8 14Z" fill="white" opacity="0.9"/>
+            <circle cx="14" cy="14" r="2.5" fill="#6C63FF"/>
+          </svg>
+        </div>
+        <div class="logo-text">
+          <span class="logo-main">ABSA</span>
+          <span class="logo-sub" data-i18n="logoSub">Arabic Sentiment Analysis</span>
+        </div>
+      </div>
+      <div class="header-right">
+        <!-- LANGUAGE TOGGLE -->
+        <button class="lang-toggle" id="langToggle" onclick="toggleLang()">
+          <span class="lang-icon">🌐</span>
+          <span id="langLabel">العربية</span>
+        </button>
+        <div class="header-badge">DeepX Challenge 2025</div>
+      </div>
+    </div>
+  </header>
+ 
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-tag">🤖 <span data-i18n="heroTag">Advanced AI Model</span></div>
+    <h1 class="hero-title" data-i18n="heroTitle">Analyze Sentiment in<br/><span class="gradient-text" data-i18n="heroTitleAccent">Arabic Reviews</span></h1>
+    <p class="hero-desc" data-i18n="heroDesc">Enter any Arabic review and the model will identify all mentioned aspects and classify the sentiment for each one independently</p>
+  </section>
+ 
+  <!-- MAIN CARD -->
+  <main class="main-card">
+    <div class="input-section">
+      <div class="input-label">
+        <span class="input-label-icon">✍️</span>
+        <span data-i18n="inputLabel">Enter your review here (Arabic text)</span>
+      </div>
+      <div class="textarea-wrapper">
+        <textarea
+          id="reviewInput"
+          data-i18n-placeholder="placeholder"
+          placeholder="Example: الأكل كان ممتاز بس الخدمة كانت بطيئة جداً والسعر مناسب..."
+          rows="4"
+          dir="auto"
+        ></textarea>
+        <div class="char-count"><span id="charCount">0</span> <span data-i18n="chars">chars</span></div>
+      </div>
+ 
+      <div class="samples-label" data-i18n="trySample">Try a sample:</div>
+      <div class="samples">
+        <button class="sample-btn" onclick="setSample('الأكل كان ممتاز جداً والخدمة سريعة لكن السعر غالي شوية')">🍕 <span data-i18n="sampleRestaurant">Restaurant</span></button>
+        <button class="sample-btn" onclick="setSample('التطبيق بطيء جداً وفيه مشاكل كثيرة في الدفع')">📱 <span data-i18n="sampleApp">App</span></button>
+        <button class="sample-btn" onclick="setSample('المكان نظيف والجو رائع والموظفين محترمين')">☕ <span data-i18n="sampleCafe">Cafe</span></button>
+        <button class="sample-btn" onclick="setSample('التوصيل تأخر ساعتين والطلب وصل بارد')">🚚 <span data-i18n="sampleDelivery">Delivery</span></button>
+      </div>
+ 
+      <button class="analyze-btn" id="analyzeBtn" onclick="analyzeReview()">
+        <span class="btn-text" data-i18n="analyzeBtn">Analyze Review</span>
+        <span class="btn-icon" id="btnArrow">→</span>
+        <div class="btn-loader" id="btnLoader"></div>
+      </button>
+    </div>
+ 
+    <div class="divider">
+      <div class="divider-line"></div>
+      <div class="divider-text" data-i18n="results">Results</div>
+      <div class="divider-line"></div>
+    </div>
+ 
+    <div class="results-section" id="resultsSection">
+      <div class="results-empty" id="resultsEmpty">
+        <div class="empty-icon">🔍</div>
+        <p data-i18n="emptyHint">Enter a review and click Analyze to see results</p>
+      </div>
+      <div id="resultsContent" style="display:none"></div>
+    </div>
+  </main>
+ 
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-num">1,971</div>
+      <div class="stat-label" data-i18n="stat1">Training Reviews</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">90.7%</div>
+      <div class="stat-label" data-i18n="stat2">F1 Accuracy</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">9</div>
+      <div class="stat-label" data-i18n="stat3">Supported Aspects</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">3</div>
+      <div class="stat-label" data-i18n="stat4">Sentiment Classes</div>
+    </div>
+  </div>
+ 
+  <!-- LEGEND -->
+  <div class="legend-card">
+    <div class="legend-title" data-i18n="legendTitle">Supported Aspects</div>
+    <div class="legend-grid">
+      <div class="legend-item"><span class="legend-emoji">🍕</span><span>food</span></div>
+      <div class="legend-item"><span class="legend-emoji">👨‍💼</span><span>service</span></div>
+      <div class="legend-item"><span class="legend-emoji">💰</span><span>price</span></div>
+      <div class="legend-item"><span class="legend-emoji">✨</span><span>cleanliness</span></div>
+      <div class="legend-item"><span class="legend-emoji">🚚</span><span>delivery</span></div>
+      <div class="legend-item"><span class="legend-emoji">🏮</span><span>ambiance</span></div>
+      <div class="legend-item"><span class="legend-emoji">📱</span><span>app_experience</span></div>
+      <div class="legend-item"><span class="legend-emoji">⭐</span><span>general</span></div>
+    </div>
+  </div>
+ 
+  <footer class="footer">
+    <p>DeepX Hackathon 2025 — Arabic ABSA System &nbsp;|&nbsp; Built with CAMeLBERT + FastAPI</p>
+  </footer>
+ 
+</div>
+ 
+<script src="/static/script.js"></script>
+</body>
+</html>
